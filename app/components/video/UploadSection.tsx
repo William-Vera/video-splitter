@@ -26,21 +26,21 @@ export function UploadSection() {
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  const { splitVideo, trimVideo, isProcessing } = useVideoProcessor();
+  const { splitVideo, trimVideo, isProcessing, progress, statusMessage } = useVideoProcessor();
+  const [showSuccess, setShowSuccess] = useState(false);
 
-  const MAX_FILE_SIZE_GB = 2;
-  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_GB * 1024 * 1024 * 1024;
+  const MAX_FILE_SIZE_MB = 500;
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
   const handleFileSelect = (selectedFile: File) => {
     setError(null);
     if (selectedFile.size > MAX_FILE_SIZE_BYTES) {
       setError(
-        `El archivo supera el límite de ${MAX_FILE_SIZE_GB} GB. Por favor, selecciona un video de menor tamaño (tu archivo pesa ${(
+        `El archivo supera el límite de ${MAX_FILE_SIZE_MB} MB. Por favor, selecciona un video de menor tamaño (tu archivo pesa ${(
           selectedFile.size /
           1024 /
-          1024 /
           1024
-        ).toFixed(2)} GB).`
+        ).toFixed(1)} MB).`
       );
       setFile(null);
       return;
@@ -78,10 +78,16 @@ export function UploadSection() {
         results = await trimVideo(file, trimStart, trimEnd);
       }
 
+      setShowSuccess(true);
       const zipName = file.name.substring(0, file.name.lastIndexOf('.')) || file.name;
       await downloadZip(results, zipName);
+
+      // Mantener la pantalla de éxito por 2.5 segundos
+      await new Promise((resolve) => setTimeout(resolve, 2500));
+      setShowSuccess(false);
     } catch (err: any) {
       setError(err.message || "Error al procesar el video.");
+      setShowSuccess(false);
     }
   }
 
@@ -250,6 +256,56 @@ export function UploadSection() {
             <ExportButton loading={isProcessing} onClick={handleSplit} />
           </div>
         </>
+      )}
+
+      {(isProcessing || showSuccess) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm transition-all duration-300">
+          <div className="w-full max-w-md rounded-3xl border border-zinc-800 bg-zinc-900/95 p-8 shadow-2xl backdrop-blur-md text-center">
+            {showSuccess ? (
+              <>
+                <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 animate-bounce">
+                  <svg className="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                <h3 className="mt-6 text-lg font-semibold text-zinc-100">
+                  ¡Procesamiento Completado!
+                </h3>
+                <p className="mt-2 text-sm text-zinc-400 animate-pulse">
+                  Iniciando descarga automáticamente...
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="relative mx-auto flex h-20 w-20 items-center justify-center animate-pulse">
+                  <div className="absolute h-full w-full rounded-full border-4 border-zinc-800/80"></div>
+                  <div className="absolute h-full w-full rounded-full border-4 border-t-blue-500 animate-spin"></div>
+                  <div className="text-xs font-semibold text-blue-400">FFmpeg</div>
+                </div>
+
+                <h3 className="mt-6 text-lg font-semibold text-zinc-100">
+                  Procesando Video
+                </h3>
+                <p className="mt-2 text-sm text-zinc-400 h-10 flex items-center justify-center font-medium">
+                  {statusMessage || "Esto puede tomar unos momentos..."}
+                </p>
+
+                <div className="mt-6">
+                  <div className="h-2 w-full rounded-full bg-zinc-800 overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 transition-all duration-300 ease-out"
+                      style={{ width: `${progress}%` }}
+                    ></div>
+                  </div>
+                  <div className="mt-2 flex justify-between text-xs text-zinc-500 font-medium">
+                    <span>Progreso</span>
+                    <span>{progress}%</span>
+                  </div>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );

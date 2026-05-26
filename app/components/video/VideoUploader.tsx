@@ -84,7 +84,7 @@ export function VideoUploader({
             MP4, WebM, MOV, AVI
           </span>
           <span className="rounded-full border border-zinc-850 bg-blue-950/20 px-3 py-1 text-blue-400 font-medium">
-            Máximo 2 GB
+            Máximo 500 MB
           </span>
         </div>
       </div>
