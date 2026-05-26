@@ -28,18 +28,19 @@ export function UploadSection() {
 
   const { splitVideo, trimVideo, isProcessing } = useVideoProcessor();
 
-  const MAX_FILE_SIZE_MB = 350;
-  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+  const MAX_FILE_SIZE_GB = 2;
+  const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_GB * 1024 * 1024 * 1024;
 
   const handleFileSelect = (selectedFile: File) => {
     setError(null);
     if (selectedFile.size > MAX_FILE_SIZE_BYTES) {
       setError(
-        `El archivo supera el límite de ${MAX_FILE_SIZE_MB} MB. Por favor, selecciona un video de menor tamaño (tu archivo pesa ${(
+        `El archivo supera el límite de ${MAX_FILE_SIZE_GB} GB. Por favor, selecciona un video de menor tamaño (tu archivo pesa ${(
           selectedFile.size /
           1024 /
+          1024 /
           1024
-        ).toFixed(1)} MB).`
+        ).toFixed(2)} GB).`
       );
       setFile(null);
       return;
