@@ -21,7 +21,7 @@ export function useVideoProcessor() {
     setIsProcessing(true);
     setProgress(0);
     setStatus("loading-ffmpeg");
-    setStatusMessage("Inicializando FFmpeg en tu navegador...");
+    setStatusMessage("Inicializando...");
 
     let ffmpeg;
     const handleProgress = ({ progress }: { progress: number }) => {
@@ -36,7 +36,7 @@ export function useVideoProcessor() {
       ffmpeg = await getFFmpeg();
 
       setStatus("reading-file");
-      setStatusMessage("Cargando video en memoria...");
+      setStatusMessage("Cargando video...");
 
       // limpiar archivos viejos
       const existingFiles = await ffmpeg.listDir("/");
@@ -58,7 +58,7 @@ export function useVideoProcessor() {
       // registrar listener de progreso
       ffmpeg.on("progress", handleProgress);
       setStatus("processing");
-      setStatusMessage("Dividiendo video en fragmentos: 0%");
+      setStatusMessage("Dividiendo video: 0%");
 
       // dividir video
       await ffmpeg.exec([
@@ -138,7 +138,7 @@ export function useVideoProcessor() {
     setIsProcessing(true);
     setProgress(0);
     setStatus("loading-ffmpeg");
-    setStatusMessage("Inicializando FFmpeg en tu navegador...");
+    setStatusMessage("Inicializando...");
 
     let ffmpeg;
     const handleProgress = ({ progress }: { progress: number }) => {
@@ -154,7 +154,7 @@ export function useVideoProcessor() {
       ffmpeg = await getFFmpeg();
 
       setStatus("reading-file");
-      setStatusMessage("Cargando video en memoria...");
+      setStatusMessage("Cargando video...");
 
       // limpiar archivos viejos
       const existingFiles = await ffmpeg.listDir("/");
@@ -192,7 +192,7 @@ export function useVideoProcessor() {
       ]);
 
       setStatus("saving");
-      setStatusMessage("Preparando descarga del video recortado...");
+      setStatusMessage("Preparando descarga...");
 
       // obtener archivo generado
       const data = await ffmpeg.readFile(outputName);
